@@ -11,35 +11,36 @@ void WriteColoredLine(string text, ConsoleColor color = ConsoleColor.Green)
 
 // AES Test
 WriteColoredLine("AES Test");
-var aes = new AesEncryptor(AesEncryptor.RandomKey(), AesEncryptor.RandomKey(), CipherMode.ECB, PaddingMode.PKCS7);
-var tmp = aes.Encrypt("Hello");
-Console.WriteLine(Convert.ToBase64String(aes.Key));
-Console.WriteLine(Convert.ToBase64String(aes.IV));
-Console.WriteLine(tmp);
-Console.WriteLine(aes.Decrypt(tmp));
+using var aes = new AesEncryptor(RandomNumberGenerator.GetBytes(16), RandomNumberGenerator.GetBytes(16), CipherMode.ECB, PaddingMode.PKCS7);
+var tmp = aes.Encrypt(Encoding.UTF8.GetBytes("Hello"));
+Console.WriteLine(Convert.ToBase64String(tmp));
+Console.WriteLine(Encoding.UTF8.GetString(aes.Decrypt(tmp)));
 
 Console.WriteLine();
 
+// RSA Test
 WriteColoredLine("RSA Test");
 var rsaKey = "";
 var rsaPublicKey = "";
 RsaEncryptor.RandomKeyXmlString(out rsaKey, out rsaPublicKey, 512);
-var rsaEncrypt = new RsaEncryptor(rsaPublicKey);
-tmp = rsaEncrypt.Encrypt("Hello, Nefe.Encryption");
-// Console.WriteLine(rsaEncrypt.XmlPublicKey);
-Console.WriteLine(tmp);
-var rsaDecrypt = new RsaEncryptor(rsaKey);
-// Console.WriteLine(rsaDecrypt.XmlKey);
-Console.WriteLine(rsaDecrypt.Decrypt(tmp));
+using var rsaEncryptor = new RsaEncryptor(rsaPublicKey);
+tmp = rsaEncryptor.Encrypt(Encoding.UTF8.GetBytes("Hello, Nefe.Encryptor"));
+// Console.WriteLine(Convert.ToBase64String(rsaEncryptor.Pkcs1PublicKey));
+Console.WriteLine(Convert.ToBase64String(tmp));
+using var rsaDecryptor = new RsaEncryptor(rsaKey);
+// Console.WriteLine(Convert.ToBase64String(rsaDecryptor.Pkcs1PrivateKey));
+Console.WriteLine(Encoding.UTF8.GetString(rsaDecryptor.Decrypt(tmp)));
 
-Console.WriteLine($"Data Verified: {rsaEncrypt.VerifyData(Encoding.UTF8.GetBytes("wsl ak ioi"), rsaDecrypt.Sign(Encoding.UTF8.GetBytes("wsl ak ioi")))}");
-Console.WriteLine($"Hash Verfied: {rsaEncrypt.VerifyHash(SHA256.Create().ComputeHash(Encoding.UTF8.GetBytes("wsl ak ioi")), rsaDecrypt.Sign(Encoding.UTF8.GetBytes("wsl ak ioi")))}");
+Console.WriteLine($"Data Verified: {rsaEncryptor.VerifyData(Encoding.UTF8.GetBytes("nefe"), rsaDecryptor.Sign(Encoding.UTF8.GetBytes("nefe")))}");
+Console.WriteLine($"Hash Verfied: {rsaEncryptor.VerifyHash(SHA256.Create().ComputeHash(Encoding.UTF8.GetBytes("nefe")), rsaDecryptor.Sign(Encoding.UTF8.GetBytes("nefe")))}");
 Console.WriteLine();
 
+// MD5 Test
 WriteColoredLine("MD5 Test");
 Console.WriteLine(BytesFormatter.Format(MD5.Create().ComputeHash(Encoding.UTF8.GetBytes("Goodbye, MD5")), "-"));
 
 Console.WriteLine();
 
+// SHA0256 Test
 WriteColoredLine("SHA-256 Test");
 Console.WriteLine(BytesFormatter.Format(SHA256.Create().ComputeHash(Encoding.UTF8.GetBytes("Hello, SHA-256")), "-"));

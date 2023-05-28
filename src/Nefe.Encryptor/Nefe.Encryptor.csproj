@@ -7,10 +7,10 @@
     
     <!-- Nuget Package -->
     <PackageId>Nefe.Encryptor</PackageId>
-    <Version>0.1-beta</Version>
+    <Version>0.1.1-beta</Version>
     <Authors>Nefe</Authors>
     <Company></Company>
-    <Description>An Encryptor on .NET(.NET Core)</Description>
+    <Description>An Encryptor on .NET</Description>
     <Copyright>Copyright 2023 Nefe reserve all rights.</Copyright>
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>

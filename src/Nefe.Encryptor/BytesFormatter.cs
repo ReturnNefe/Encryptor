@@ -1,7 +1,4 @@
-﻿using System.Security.Cryptography;
-using System.Text;
-
-namespace Nefe.Encryptor
+﻿namespace Nefe.Encryptor
 {
     /// <summary>
     /// The encryptor that is used to perform MD5 algorithm.
@@ -24,7 +21,7 @@ namespace Nefe.Encryptor
             foreach (var iter in data)
                 result += $"{iter.ToString(format)}{separator}";
 
-            return result[..^separator.Length];
+            return result.Remove(result.Length - 1);
         }
         
         #endregion

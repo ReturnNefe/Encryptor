@@ -10,9 +10,9 @@ namespace Nefe.Encryptor
     public class AesEncryptor : IDisposable
     {
         #region [Private Properties]
-        
+
         private Aes aesProvider = null!;
-        
+
         #endregion
 
         #region [Public Properties]
@@ -36,8 +36,12 @@ namespace Nefe.Encryptor
         }
 
         /// <summary>
-        /// Creates a AES Encryptor
+        /// Creates a AES Encryptor.
         /// </summary>
+        /// <param name="key">The secret key used for AES algorithm. The length of it could be 16/24/32.</param>
+        /// <param name="iv">The initialization vector used for AES algorithm. The length of it could be 16/24/32.</param>
+        /// <param name="cipherMode">The cipher mode used.</param>
+        /// <param name="paddingMode">The padding mode used.</param>
         public AesEncryptor(byte[] key, byte[]? iv = null, CipherMode cipherMode = CipherMode.CBC, PaddingMode paddingMode = PaddingMode.PKCS7)
         {
             this.aesProvider = Aes.Create();
@@ -48,7 +52,7 @@ namespace Nefe.Encryptor
             if (iv != null)
                 this.aesProvider.IV = iv;
         }
-        
+
         #endregion
 
         #region [Public Events]
@@ -60,7 +64,7 @@ namespace Nefe.Encryptor
 
         /// <summary>
         /// Releases all sources used.
-        /// <summary/>
+        /// </summary>
         public void Dispose() => this.aesProvider.Dispose();
 
         /// <summary>
@@ -68,17 +72,17 @@ namespace Nefe.Encryptor
         /// </summary>
         /// <param name="length">The length of key.</param>
         /// <returns>The generated key.</returns>
-        public static byte[] RandomKey(int length = 16)
-        { 
+        public static byte[] GenerateBytes(int length = 16)
+        {
             var random = new Random();
-            var ret = new byte[length];
+            var result = new byte[length];
 
             for (int i = 0; i < length; ++i)
             {
-                ret[i] = (byte)random.Next(0, 255);
+                result[i] = (byte)random.Next(0, 255);
             }
 
-            return ret;
+            return result;
         }
 
         /// <summary>
@@ -96,7 +100,7 @@ namespace Nefe.Encryptor
                 var mode = random.Next(0, 3);
                 if (mode == 0)
                     ret += (char)(random.Next(0, 15) + 33);
-                else if(mode == 1)
+                else if (mode == 1)
                     ret += (char)(random.Next(0, 26) + 'A');
                 else
                     ret += (char)(random.Next(0, 26) + 'a');
@@ -114,21 +118,6 @@ namespace Nefe.Encryptor
             ICryptoTransform cTransform = aesProvider.CreateEncryptor();
             return cTransform.TransformFinalBlock(data, 0, data.Length);
         }
-        
-        /// <summary>
-        /// Try to encrypt a piece of plaintext encoded using UTF-8.
-        /// </summary>
-        /// <param name="data">The data that need to be encrypted.</param>
-        /// <returns>The ciphertext.</returns>
-        public string Encrypt(string text) => Convert.ToBase64String(Encrypt(Encoding.UTF8.GetBytes(text)));
-
-        /// <summary>
-        /// Try to encrypt a piece of plaintext encoded by <paramref name="encoder"/>.
-        /// </summary>
-        /// <param name="data">The data that need to be encrypted.</param>
-        /// <param name="encoder">The encoder used to decode text.</param>
-        /// <returns>The ciphertext.</returns>
-        public string Encrypt(string text, Encoding encoder) => Convert.ToBase64String(Encrypt(encoder.GetBytes(text)));
 
         /// <summary>
         /// Try to decrypt a piece of ciphertext.
@@ -141,21 +130,6 @@ namespace Nefe.Encryptor
             return cTransform.TransformFinalBlock(data, 0, data.Length);
         }
 
-        /// <summary>
-        /// Try to decrypt a piece of ciphertext encoded using UTF-8.
-        /// </summary>
-        /// <param name="data">The data that need to be decrypted.</param>
-        /// <returns>The plaintext.</returns>
-        public string Decrypt(string text) => Encoding.UTF8.GetString(Decrypt(Convert.FromBase64String(text)));
-
-        /// <summary>
-        /// Try to decrypt a piece of ciphertext encoded by <paramref name="encoder"/>.
-        /// </summary>
-        /// <param name="data">The data that need to be decrypted.</param>
-        /// <param name="encoder">The encoder used to decode text.</param>
-        /// <returns>The plaintext.</returns>
-        public string Decrypt(string text, Encoding encoder) => encoder.GetString(Decrypt(Convert.FromBase64String(text)));
-        
         #endregion
     }
 }
